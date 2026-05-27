@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informe – Sistema de Rutinas de Entrenamiento</title>
+  <style>
+    /* ── Configuración de página ─────────────────────────────── */
+    @page { size: letter; margin: 2.5cm 2.8cm; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      color: #111;
+      line-height: 1.6;
+      background: #fff;
+    }
+
+    /* ── Saltos de página ────────────────────────────────────── */
+    .page-break { page-break-after: always; break-after: page; }
+
+    /* ── PORTADA ─────────────────────────────────────────────── */
+    .portada {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 96vh;
+      padding: 1cm 0;
+      text-align: center;
+    }
+
+    .portada-logo {
+      width: 80px;
+      height: 80px;
+      border: 2px solid #555;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10pt;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    .portada-inst h1 { font-size: 15pt; font-weight: bold; margin-bottom: 4px; }
+    .portada-inst h2 { font-size: 13pt; font-weight: normal; margin-bottom: 2px; }
+    .portada-inst h3 { font-size: 12pt; font-weight: normal; color: #333; }
+
+    .portada-titulo {
+      border-top: 2px solid #222;
+      border-bottom: 2px solid #222;
+      padding: 18px 0;
+      width: 100%;
+    }
+    .portada-titulo h2 { font-size: 16pt; font-weight: bold; margin-bottom: 6px; }
+    .portada-titulo h3 { font-size: 13pt; font-weight: normal; color: #444; }
+
+    .portada-datos { width: 100%; text-align: left; }
+    .portada-datos table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11pt;
+    }
+    .portada-datos td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #ccc;
+      vertical-align: top;
+    }
+    .portada-datos td:first-child {
+      font-weight: bold;
+      width: 40%;
+      color: #333;
+    }
+
+    .campo-vacio {
+      display: inline-block;
+      min-width: 220px;
+      border-bottom: 1px solid #666;
+      color: #bbb;
+      font-style: italic;
+      font-size: 10pt;
+    }
+
+    /* ── CUERPO DEL INFORME ───────────────────────────────────── */
+    .contenido { padding: 0.2cm 0; }
+
+    h1.seccion {
+      font-size: 15pt;
+      font-weight: bold;
+      color: #1a1a2e;
+      border-bottom: 2px solid #1a1a2e;
+      padding-bottom: 5px;
+      margin-top: 28px;
+      margin-bottom: 14px;
+    }
+
+    h2.subseccion {
+      font-size: 12.5pt;
+      font-weight: bold;
+      color: #222;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+
+    p { margin-bottom: 10px; text-align: justify; }
+
+    ul, ol {
+      margin-left: 22px;
+      margin-bottom: 10px;
+    }
+    li { margin-bottom: 4px; }
+
+    /* ── DIAGRAMA DE CLASES ────────────────────────────────────── */
+    .diagrama-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-family: "Courier New", monospace;
+      font-size: 8.5pt;
+      line-height: 1.3;
+    }
+
+    .diagrama {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+
+    .paquete {
+      border: 2px solid #1a1a2e;
+      border-radius: 4px;
+      padding: 6px;
+      min-width: 170px;
+      background: #f8f9fd;
+    }
+
+    .paquete-titulo {
+      background: #1a1a2e;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+      font-size: 9pt;
+      padding: 3px 8px;
+      margin: -6px -6px 8px -6px;
+      border-radius: 2px 2px 0 0;
+      letter-spacing: 0.5px;
+    }
+
+    .clase {
+      border: 1px solid #555;
+      background: white;
+      margin-bottom: 6px;
+      font-size: 8pt;
+    }
+
+    .clase-nombre {
+      background: #2c3e6e;
+      color: white;
+      padding: 2px 6px;
+      font-weight: bold;
+      font-size: 8pt;
+    }
+
+    .clase-nombre.interfaz { background: #3d7a5c; font-style: italic; }
+    .clase-nombre.enum-cls { background: #7a4a2e; }
+
+    .clase-campos, .clase-metodos {
+      padding: 2px 6px;
+      border-top: 1px solid #ccc;
+      font-size: 7.5pt;
+    }
+
+    .clase-campos div, .clase-metodos div {
+      padding: 1px 0;
+    }
+
+    /* ── RELACIONES ────────────────────────────────────────────── */
+    .relaciones {
+      border: 1px solid #aaa;
+      background: #fafafa;
+      padding: 10px 14px;
+      font-size: 10pt;
+      margin: 14px 0;
+      border-radius: 3px;
+    }
+    .relaciones table { width: 100%; border-collapse: collapse; }
+    .relaciones td    { padding: 3px 8px; font-size: 10pt; }
+    .relaciones td:first-child { font-family: "Courier New", monospace; font-size: 9pt; color: #333; width: 38%; }
+
+    /* ── TABLA DE DECISIONES ───────────────────────────────────── */
+    .tabla-decision {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 10.5pt;
+    }
+    .tabla-decision th {
+      background: #1a1a2e;
+      color: white;
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: bold;
+    }
+    .tabla-decision td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+    .tabla-decision tr:nth-child(even) td { background: #f4f6fb; }
+
+    /* ── NOTA DE PIE ───────────────────────────────────────────── */
+    .nota {
+      border-left: 3px solid #2c3e6e;
+      padding: 6px 12px;
+      background: #f0f4ff;
+      font-size: 10pt;
+      color: #333;
+      margin: 12px 0;
+      font-style: italic;
+    }
+
+    /* Numeración de secciones */
+    .num { color: #1a1a2e; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     PORTADA
+═════════════════════════════════════════════════ -->
+<div class="portada page-break">
+
+  <div class="portada-inst">
+    <div class="portada-logo">Escudo</div>
+    <h1><span class="campo-vacio">[Nombre de la Universidad]</span></h1>
+    <h2><span class="campo-vacio">[Facultad]</span></h2>
+    <h3><span class="campo-vacio">[Carrera]</span></h3>
+    <h3 style="margin-top:6px;"><span class="campo-vacio">[Asignatura]</span></h3>
+  </div>
+
+  <div class="portada-titulo">
+    <h2>Informe de Diseño</h2>
+    <h3>Sistema de Administración de Rutinas de Entrenamiento Personalizado</h3>
+    <p style="margin-top:8px; font-size:11pt; color:#555;">
+      <span class="campo-vacio">[Nombre de la Tarea / N.° de Tarea]</span>
+    </p>
+  </div>
+
+  <div class="portada-datos">
+    <table>
+      <tr>
+        <td>Integrante(s):</td>
+        <td>
+          <span class="campo-vacio">[Nombre completo — RUT]</span><br>
+          <span class="campo-vacio">[Nombre completo — RUT]</span><br>
+          <span class="campo-vacio">[Nombre completo — RUT]</span>
+        </td>
+      </tr>
+      <tr>
+        <td>NRC de la sección:</td>
+        <td><span class="campo-vacio">[NRC]</span></td>
+      </tr>
+      <tr>
+        <td>Ciudad:</td>
+        <td><span class="campo-vacio">[Ciudad]</span></td>
+      </tr>
+      <tr>
+        <td>Fecha de entrega:</td>
+        <td><span class="campo-vacio">[DD / MM / AAAA]</span></td>
+      </tr>
+    </table>
+  </div>
+
+</div><!-- fin portada -->
+
+
+<!-- ════════════════════════════════════════════════
+     CONTENIDO
+═════════════════════════════════════════════════ -->
+<div class="contenido">
+
+  <!-- ────────────────────────────────────────────
+       1. INTRODUCCIÓN
+  ──────────────────────────────────────────────── -->
+  <h1 class="seccion"><span class="num">1.</span> Introducción</h1>
+
+  <h2 class="subseccion">1.1 Motivación</h2>
+  <p>
+    La actividad física regular es reconocida como uno de los pilares fundamentales de la salud preventiva.
+    Sin embargo, la planificación de rutinas de entrenamiento personalizadas suele requerir conocimientos
+    especializados o herramientas costosas. La posibilidad de contar con un sistema que automatice la
+    generación de rutinas a partir de un catálogo de ejercicios configurable representa un aporte concreto
+    tanto para usuarios independientes como para instructores que administran múltiples planes de entrenamiento.
+  </p>
+  <p>
+    Desde el punto de vista formativo, el desarrollo de este sistema ofrece la oportunidad de integrar
+    conceptos fundamentales de programación orientada a objetos —encapsulamiento, herencia, interfaces y
+    polimorfismo— con patrones de diseño consolidados y buenas prácticas de arquitectura de software.
+  </p>
+
+  <h2 class="subseccion">1.2 Objetivo del trabajo</h2>
+  <p>
+    El objetivo principal es diseñar e implementar una aplicación de escritorio con interfaz gráfica (Java Swing)
+    que permita gestionar un catálogo de ejercicios cargado desde archivo CSV o base de datos SQLite, generar
+    rutinas de entrenamiento personalizadas respetando una restricción de no repetición semanal, y revisar la
+    rutina generada ejercicio por ejercicio hasta obtener un resumen final.
+  </p>
+  <p>Los objetivos específicos son:</p>
+  <ul>
+    <li>Aplicar el patrón Observer para desacoplar la lógica de negocio de la interfaz gráfica.</li>
+    <li>Modularizar la solución en los paquetes <strong>backend</strong> y <strong>frontend</strong>.</li>
+    <li>Implementar validación robusta de datos mediante una excepción personalizada.</li>
+    <li>Persistir el historial semanal en disco para garantizar variedad en semanas consecutivas.</li>
+  </ul>
+
+  <h2 class="subseccion">1.3 Estructura del documento</h2>
+  <p>
+    El presente informe se organiza de la siguiente manera: la <strong>Sección 2</strong> describe la solución
+    propuesta, detallando las clases diseñadas, las relaciones entre ellas y las decisiones de diseño que
+    las justifican, incluyendo el diagrama de clases. La <strong>Sección 3</strong> presenta las conclusiones
+    del trabajo, evaluando el cumplimiento de los objetivos y los aprendizajes obtenidos.
+  </p>
+
+
+  <!-- ────────────────────────────────────────────
+       2. DESCRIPCIÓN DE LA SOLUCIÓN
+  ──────────────────────────────────────────────── -->
+  <h1 class="seccion"><span class="num">2.</span> Descripción de la Solución</h1>
+
+  <h2 class="subseccion">2.1 Modelo propuesto</h2>
+  <p>
+    La solución se articula en torno a una arquitectura en dos capas claramente diferenciadas: el paquete
+    <strong>backend</strong>, que contiene toda la lógica de negocio (modelos, carga, generación e historial),
+    y el paquete <strong>frontend</strong>, responsable exclusivo de la interfaz gráfica Swing. La comunicación
+    entre ambas capas se realiza de forma asincrónica mediante el patrón de diseño <strong>Observer</strong>
+    (notificación-suscripción), garantizando que el backend nunca dependa ni referencie directamente las
+    ventanas de la interfaz.
+  </p>
+  <p>
+    El flujo principal de la aplicación es lineal: el usuario carga un catálogo de ejercicios, configura los
+    requisitos de la rutina, navega por los ejercicios generados y obtiene un resumen final. Cada etapa
+    corresponde a una ventana Swing independiente, lo que favorece la cohesión y facilita el mantenimiento.
+  </p>
+
+  <h2 class="subseccion">2.2 Clases diseñadas</h2>
+
+  <!-- ── Diagrama de clases ─────────────────────── -->
+  <div class="diagrama-container">
+    <div class="diagrama">
+
+      <!-- PAQUETE BACKEND -->
+      <div class="paquete" style="min-width:210px;">
+        <div class="paquete-titulo">&lt;&lt;package&gt;&gt; backend</div>
+
+        <div class="clase">
+          <div class="clase-nombre enum-cls">&lt;&lt;enum&gt;&gt; TipoEjercicio</div>
+          <div class="clase-campos">
+            <div>CARDIOVASCULAR</div>
+            <div>FUERZA</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ desdeTexto(v: String): TipoEjercicio</div>
+            <div>+ getNombre(): String</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre enum-cls">&lt;&lt;enum&gt;&gt; NivelIntensidad</div>
+          <div class="clase-campos">
+            <div>BAJA | MEDIA | ALTA</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ desdeTexto(v: String): NivelIntensidad</div>
+            <div>+ getNombre(): String</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre enum-cls">&lt;&lt;enum&gt;&gt; Evento</div>
+          <div class="clase-campos">
+            <div>EJERCICIOS_CARGADOS</div>
+            <div>ERROR_CARGA</div>
+            <div>RUTINA_GENERADA</div>
+            <div>ERROR_GENERACION</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre interfaz">&lt;&lt;interface&gt;&gt; Observador</div>
+          <div class="clase-metodos">
+            <div>+ alRecibir(ev: Evento, datos: Object)</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre enum-cls">&lt;&lt;exception&gt;&gt; ExcepcionCarga</div>
+          <div class="clase-campos">
+            <div>- tipo: Tipo</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ getTipo(): Tipo</div>
+            <div>&lt;&lt;enum&gt;&gt; Tipo: {ARCHIVO_NO_ENCONTRADO,</div>
+            <div>  FORMATO_INVALIDO, DATOS_INCOMPLETOS,</div>
+            <div>  ERROR_BD, VACIO}</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">Ejercicio</div>
+          <div class="clase-campos">
+            <div>- id: int</div>
+            <div>- nombre: String</div>
+            <div>- tipo: TipoEjercicio</div>
+            <div>- intensidad: NivelIntensidad</div>
+            <div>- tiempoMin: int</div>
+            <div>- descripcion: String</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ getId(): int</div>
+            <div>+ getNombre(): String</div>
+            <div>+ getTipo(): TipoEjercicio</div>
+            <div>+ getIntensidad(): NivelIntensidad</div>
+            <div>+ getTiempoMin(): int</div>
+            <div>+ getDescripcion(): String</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">Rutina</div>
+          <div class="clase-campos">
+            <div>- ejercicios: List&lt;Ejercicio&gt;</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ getEjercicios(): List&lt;Ejercicio&gt;</div>
+            <div>+ total(): int</div>
+            <div>+ tiempoTotal(): int</div>
+            <div>+ porTipo(): Map&lt;TipoEjercicio, Int&gt;</div>
+            <div>+ porIntensidad(): Map&lt;NivelIntensidad, Int&gt;</div>
+            <div>+ get(i: int): Ejercicio</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">HistorialSemanal</div>
+          <div class="clase-metodos">
+            <div>+ «static» guardar(ejs: List&lt;Ejercicio&gt;)</div>
+            <div>+ «static» cargar(): Set&lt;String&gt;</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">GeneradorRutina</div>
+          <div class="clase-metodos">
+            <div>+ generar(todos, requisitos, historial): Rutina</div>
+            <div>- aleatorio(lista, n, rand): List&lt;Ejercicio&gt;</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">CargadorEjercicios</div>
+          <div class="clase-metodos">
+            <div>+ desdeCSV(ruta: String): List&lt;Ejercicio&gt;</div>
+            <div>+ desdeBaseDeDatos(ruta: String): List&lt;Ejercicio&gt;</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">Controlador</div>
+          <div class="clase-campos">
+            <div>- instancia: Controlador «static»</div>
+            <div>- observadores: List&lt;Observador&gt;</div>
+            <div>- ejercicios: List&lt;Ejercicio&gt;</div>
+            <div>- rutinaActual: Rutina</div>
+            <div>- fuenteDatos: String</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ getInstance(): Controlador «static»</div>
+            <div>+ suscribir(o: Observador)</div>
+            <div>+ desuscribir(o: Observador)</div>
+            <div>- notificar(ev: Evento, datos: Object)</div>
+            <div>+ cargarDesdeArchivo(ruta: String)</div>
+            <div>+ cargarDesdeBaseDeDatos(ruta: String)</div>
+            <div>+ generarRutina(requisitos: Map)</div>
+            <div>+ estadisticas(): Map&lt;String,Object&gt;</div>
+            <div>+ hayEjercicios(): boolean</div>
+          </div>
+        </div>
+
+      </div><!-- fin paquete backend -->
+
+      <!-- PAQUETE FRONTEND -->
+      <div class="paquete" style="min-width:210px;">
+        <div class="paquete-titulo">&lt;&lt;package&gt;&gt; frontend</div>
+
+        <div class="clase">
+          <div class="clase-nombre">VentanaPrincipal</div>
+          <div class="clase-campos">
+            <div>- ctrl: Controlador</div>
+            <div>- lblTotal, lblTiempo, ...: JLabel</div>
+            <div>- btnGenerar: JButton</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ alRecibir(ev: Evento, datos: Object)</div>
+            <div>- actualizarEstadisticas()</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">VentanaCarga</div>
+          <div class="clase-campos">
+            <div>- ctrl: Controlador</div>
+            <div>- cmbFuente: JComboBox</div>
+            <div>- txtRuta: JTextField</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ alRecibir(ev: Evento, datos: Object)</div>
+            <div>- cargar()</div>
+            <div>- examinar()</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">VentanaGeneracion</div>
+          <div class="clase-campos">
+            <div>- ctrl: Controlador</div>
+            <div>- spinners: Map&lt;TipoEjercicio,</div>
+            <div>    Map&lt;NivelIntensidad, JSpinner&gt;&gt;</div>
+          </div>
+          <div class="clase-metodos">
+            <div>+ alRecibir(ev: Evento, datos: Object)</div>
+            <div>- generar()</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">VentanaRevision</div>
+          <div class="clase-campos">
+            <div>- rutina: Rutina</div>
+            <div>- indice: int</div>
+            <div>- btnVolver, btnSiguiente: JButton</div>
+          </div>
+          <div class="clase-metodos">
+            <div>- actualizar()</div>
+          </div>
+        </div>
+
+        <div class="clase">
+          <div class="clase-nombre">VentanaResumen</div>
+          <div class="clase-campos">
+            <div>- rutina: Rutina</div>
+          </div>
+          <div class="clase-metodos">
+            <div>- tarjeta(titulo, color, lineas): JPanel</div>
+          </div>
+        </div>
+
+      </div><!-- fin paquete frontend -->
+
+    </div><!-- fin diagrama -->
+  </div><!-- fin diagrama-container -->
+
+  <div class="nota">
+    <strong>Nota sobre el diagrama:</strong> Las flechas de relación se describen en detalle en la
+    tabla de relaciones de la sección 2.3. Las ventanas del frontend implementan la interfaz
+    <code>Observador</code> y se comunican con <code>Controlador</code> exclusivamente a través
+    de los métodos <code>suscribir</code>, <code>desuscribir</code> y <code>alRecibir</code>.
+  </div>
+
+  <h2 class="subseccion">2.3 Relaciones entre clases</h2>
+
+  <div class="relaciones">
+    <table>
+      <tr>
+        <td><strong>Relación</strong></td>
+        <td><strong>Clases involucradas</strong></td>
+        <td><strong>Descripción</strong></td>
+      </tr>
+      <tr>
+        <td>Implementación</td>
+        <td>VentanaPrincipal, VentanaCarga, VentanaGeneracion → Observador</td>
+        <td>Las ventanas implementan la interfaz <code>Observador</code> para recibir notificaciones del backend.</td>
+      </tr>
+      <tr>
+        <td>Asociación (Observer)</td>
+        <td>Controlador → Observador (1 a *)</td>
+        <td>El Controlador mantiene una lista de observadores suscritos y los notifica ante eventos relevantes.</td>
+      </tr>
+      <tr>
+        <td>Dependencia de uso</td>
+        <td>Controlador → CargadorEjercicios, GeneradorRutina, HistorialSemanal</td>
+        <td>El Controlador delega las operaciones concretas a cada clase especializada.</td>
+      </tr>
+      <tr>
+        <td>Composición</td>
+        <td>Rutina ◆── Ejercicio (1 a *)</td>
+        <td>Una Rutina contiene una lista inmutable de Ejercicios; los Ejercicios no existen de forma independiente fuera de la Rutina generada.</td>
+      </tr>
+      <tr>
+        <td>Dependencia de tipo</td>
+        <td>Ejercicio → TipoEjercicio, NivelIntensidad</td>
+        <td>Cada Ejercicio referencia exactamente un TipoEjercicio y un NivelIntensidad.</td>
+      </tr>
+      <tr>
+        <td>Dependencia</td>
+        <td>CargadorEjercicios → ExcepcionCarga</td>
+        <td>El cargador lanza ExcepcionCarga ante cualquier error de validación.</td>
+      </tr>
+      <tr>
+        <td>Herencia (excepción)</td>
+        <td>ExcepcionCarga → Exception</td>
+        <td>Hereda de Exception (excepción verificada) para obligar al llamador a manejarla explícitamente.</td>
+      </tr>
+      <tr>
+        <td>Dependencia</td>
+        <td>VentanaRevision → Rutina, VentanaResumen → Rutina</td>
+        <td>Ambas ventanas reciben una Rutina como parámetro y leen sus datos para mostrarlos.</td>
+      </tr>
+      <tr>
+        <td>Singleton</td>
+        <td>Controlador (auto-referencia)</td>
+        <td>El Controlador implementa el patrón Singleton; todas las ventanas obtienen la misma instancia mediante <code>getInstance()</code>.</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2 class="subseccion">2.4 Justificación de decisiones de diseño</h2>
+
+  <table class="tabla-decision">
+    <thead>
+      <tr>
+        <th>Decisión</th>
+        <th>Alternativa descartada</th>
+        <th>Justificación</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Patrón Observer</strong> para comunicación entre capas</td>
+        <td>Llamadas directas del backend a métodos de las ventanas</td>
+        <td>El Observer garantiza el principio de inversión de dependencias: el backend no conoce ni depende de las clases Swing. Permite agregar o eliminar ventanas sin modificar el Controlador.</td>
+      </tr>
+      <tr>
+        <td><strong>Notificación en el EDT</strong> mediante <code>SwingUtilities.invokeLater</code></td>
+        <td>Actualizar la UI directamente desde el hilo de carga</td>
+        <td>Swing no es thread-safe. Todas las modificaciones a componentes gráficos deben realizarse en el Event Dispatch Thread; de lo contrario se producen condiciones de carrera y comportamientos indefinidos.</td>
+      </tr>
+      <tr>
+        <td><strong>Singleton</strong> en el Controlador</td>
+        <td>Pasar el controlador como parámetro a cada ventana</td>
+        <td>Al existir un único controlador compartido, todas las ventanas acceden al mismo estado de la aplicación sin necesidad de sincronización adicional ni de pasar referencias entre constructores.</td>
+      </tr>
+      <tr>
+        <td><strong>Enums</strong> para TipoEjercicio y NivelIntensidad</td>
+        <td>Cadenas de texto libres o constantes enteras</td>
+        <td>Los enums restringen el dominio de valores en tiempo de compilación, eliminando errores por valores inválidos y habilitando el uso de <code>switch</code> exhaustivo y colecciones como EnumMap para mayor eficiencia.</td>
+      </tr>
+      <tr>
+        <td><strong>ExcepcionCarga verificada</strong> con enum de tipos de error</td>
+        <td>Excepción genérica o código de retorno entero</td>
+        <td>La excepción verificada obliga al compilador a que el código cliente la maneje. El enum interno <code>Tipo</code> permite reaccionar distinto ante cada categoría de error (archivo no encontrado, formato inválido, etc.) sin parsear el mensaje de texto.</td>
+      </tr>
+      <tr>
+        <td><strong>Lista inmutable</strong> en Rutina</td>
+        <td>Lista mutable accesible directamente</td>
+        <td>Encapsular los ejercicios como lista inmutable (<code>Collections.unmodifiableList</code>) garantiza que ningún componente externo pueda modificar la rutina generada, respetando el principio de encapsulamiento.</td>
+      </tr>
+      <tr>
+        <td><strong>Persistencia del historial</strong> en archivo de texto plano</td>
+        <td>Base de datos separada o solo en memoria</td>
+        <td>El archivo de texto es suficiente para la restricción semanal y no requiere dependencias adicionales. Persiste entre ejecuciones del programa, lo que permite cumplir la restricción aunque el usuario reinicie la aplicación.</td>
+      </tr>
+      <tr>
+        <td><strong>Detección automática del delimitador</strong> en el CSV</td>
+        <td>Exigir siempre el mismo delimitador</td>
+        <td>Los archivos CSV generados por diferentes programas (Excel, LibreOffice, etc.) pueden usar coma o punto y coma. La detección automática mejora la usabilidad sin añadir complejidad al usuario.</td>
+      </tr>
+      <tr>
+        <td><strong>CopyOnWriteArrayList</strong> para la lista de observadores</td>
+        <td>ArrayList con bloque synchronized</td>
+        <td>Los hilos de carga notifican mientras el EDT puede suscribir o desuscribir ventanas. CopyOnWriteArrayList es thread-safe para estas operaciones sin requerir bloqueos explícitos, reduciendo el riesgo de deadlocks.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="subseccion">2.5 Descripción del flujo de la aplicación</h2>
+  <p>
+    El sistema sigue un flujo de cinco etapas correspondientes a sus cinco ventanas:
+  </p>
+  <ol>
+    <li>
+      <strong>Carga de ejercicios (VentanaCarga):</strong> el usuario selecciona la fuente de datos
+      (CSV o SQLite) y la ruta del archivo. El Controlador lanza un hilo de fondo que delega en
+      <code>CargadorEjercicios</code>. Al finalizar, notifica <code>EJERCICIOS_CARGADOS</code> o
+      <code>ERROR_CARGA</code> a todos los observadores suscritos.
+    </li>
+    <li>
+      <strong>Visualización de estadísticas (VentanaPrincipal):</strong> al recibir
+      <code>EJERCICIOS_CARGADOS</code>, la ventana principal actualiza las tarjetas con el total
+      de ejercicios, el tiempo disponible, la distribución por tipo y por nivel de intensidad,
+      y habilita el botón de generación.
+    </li>
+    <li>
+      <strong>Generación de rutina (VentanaGeneracion):</strong> el usuario configura cuántos
+      ejercicios de cada tipo e intensidad desea. El Controlador carga el historial semanal,
+      invoca a <code>GeneradorRutina</code> y persiste el nuevo historial. Notifica
+      <code>RUTINA_GENERADA</code> con la Rutina resultante.
+    </li>
+    <li>
+      <strong>Revisión ejercicio a ejercicio (VentanaRevision):</strong> el usuario navega
+      por la rutina con los botones "Volver" y "Siguiente". En el último ejercicio, el botón
+      cambia a "Resumen de la rutina".
+    </li>
+    <li>
+      <strong>Resumen final (VentanaResumen):</strong> muestra la distribución estadística
+      de la rutina generada: totales por tipo, por intensidad y tiempo estimado total.
+    </li>
+  </ol>
+
+
+  <!-- ────────────────────────────────────────────
+       3. CONCLUSIÓN
+  ──────────────────────────────────────────────── -->
+  <h1 class="seccion"><span class="num">3.</span> Conclusión</h1>
+
+  <h2 class="subseccion">3.1 Reflexión sobre el trabajo realizado</h2>
+  <p>
+    El desarrollo del sistema de rutinas de entrenamiento permitió poner en práctica de forma integrada
+    los principios de la programación orientada a objetos, la programación orientada a eventos y los
+    patrones de diseño. La división en paquetes <strong>backend</strong> y <strong>frontend</strong>
+    resultó ser una guía de organización efectiva que mantuvo bajo control la complejidad del proyecto,
+    facilitando la localización de errores y la extensión del sistema.
+  </p>
+  <p>
+    La implementación del patrón Observer representó el mayor desafío técnico, pues requirió comprender
+    cómo coordinar hilos de fondo con el Event Dispatch Thread de Swing sin incurrir en condiciones de
+    carrera. El uso de <code>SwingUtilities.invokeLater</code> demostró ser la solución estándar y
+    robusta para este problema, y su comprensión profunda constituye un aprendizaje transferible a
+    cualquier aplicación Java con interfaz gráfica.
+  </p>
+
+  <h2 class="subseccion">3.2 Cumplimiento de objetivos</h2>
+  <p>
+    El sistema cumple con todos los requerimientos establecidos: carga desde archivo CSV y base de datos
+    SQLite con validación completa, generación de rutinas configurables por tipo e intensidad, restricción
+    de no repetición semanal persistida en disco, navegación con estado entre ejercicios, y cinco ventanas
+    Swing diferenciadas. La comunicación entre capas se realiza exclusivamente a través del mecanismo de
+    notificación-suscripción, sin referencias directas del backend al frontend.
+  </p>
+
+  <h2 class="subseccion">3.3 Aprendizajes obtenidos</h2>
+  <ul>
+    <li>
+      <strong>Patrón Observer aplicado:</strong> se comprendió cómo implementar el desacoplamiento
+      entre productor y consumidor de eventos, y la importancia de gestionar correctamente el ciclo
+      de vida de los observadores (suscripción y desuscripción) para evitar fugas de memoria.
+    </li>
+    <li>
+      <strong>Multithreading en aplicaciones de escritorio:</strong> se aprendió que las operaciones
+      costosas deben ejecutarse en hilos separados para no bloquear la interfaz, y que la actualización
+      de componentes Swing debe ser siempre redirigida al EDT.
+    </li>
+    <li>
+      <strong>Diseño de excepciones personalizadas:</strong> el uso de una excepción con un enum interno
+      de tipos resultó más expresivo y mantenible que el manejo genérico de errores, permitiendo al código
+      cliente tomar decisiones específicas según la causa del fallo.
+    </li>
+    <li>
+      <strong>Separación de responsabilidades:</strong> mantener las clases con una única responsabilidad
+      bien definida (un cargador que solo carga, un generador que solo genera, un controlador que coordina)
+      redujo la complejidad de cada clase individualmente y facilitó las pruebas y modificaciones.
+    </li>
+    <li>
+      <strong>Persistencia liviana:</strong> la restricción semanal pudo implementarse de forma simple
+      con un archivo de texto plano, demostrando que no siempre es necesario recurrir a una base de datos
+      completa para resolver problemas de persistencia sencillos.
+    </li>
+  </ul>
+
+</div><!-- fin contenido -->
+
+</body>
+</html>
